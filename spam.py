@@ -60,7 +60,17 @@ def naive_bayes(message):
 	q=classify(message,word,words_spam,words_not_spam,alpha,N_spam,N_vocabulary,N_wi_spam,P_spam,P_not_spam,N_not_spam)
 	print (q)
 	
-	
+def N_wi_spam(word,message_spam):
+	contador=0
+	for i in range(len(message_spam)):
+		if word in message_spam[i]:
+			w=message_spam[i].split()
+			for i in range(len(w)):
+				if word==w[i]:
+					contador+=1
+				else:
+					i=i+1
+	return contador	
 	
 def spam_(word,words_spam,alpha,N_spam,N_vocabulary,N_wi_spam,P_spam):
 	if word in words_spam:
