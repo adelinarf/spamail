@@ -54,7 +54,7 @@ def naive_bayes(message):
 	N_wi_spam=contador-N_spam  # Number of words that repeats in every spam mail
 	#print (N_wi_spam)
 	alpha=1
-	P_spam=N_spam/N_vocabulary
+	P_spam=len(message_spam)/cantidad_mensajes
 	P_not_spam=N_not_spam/N_vocabulary
 	
 	q=classify(message,word,words_spam,words_not_spam,alpha,N_spam,N_vocabulary,N_wi_spam,P_spam,P_not_spam,N_not_spam)
