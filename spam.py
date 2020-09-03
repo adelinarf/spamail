@@ -109,14 +109,14 @@ def naive_bayes(message):
 	
 def spam_(word,words_spam,alpha,N_spam,N_vocabulary,message_spam,P_spam):
 	if word in words_spam:
-		return P_spam*(N_wi_spam(word,message_spam)+alpha)/(N_spam+(alpha*N_vocabulary))
+		return (N_wi_spam(word,message_spam)+alpha)/(N_spam+(alpha*N_vocabulary))
 	else:
 		return 1
 	
 	
 def not_spam_(word,words_not_spam,P_not_spam,message_spam,alpha,N_vocabulary,N_not_spam):
 	if word in words_not_spam:
-		return P_not_spam*(N_wi_spam(word,message_spam)+alpha)/(N_not_spam+(alpha*N_vocabulary))
+		return (N_wi_spam(word,message_spam)+alpha)/(N_not_spam+(alpha*N_vocabulary))
 	else:
 		return 1
 
