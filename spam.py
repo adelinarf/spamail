@@ -11,11 +11,11 @@ class testData:
         def __init__(self):
                 """Note: mq means message quantity"""
                 self.test = parseFile()
-                self.mq = len(test)
-                self.train_data = random.sample(test, floor(cantidad_mensajes * 0.8))
-                self.mq_train = len(train_data)
-                self.test_data = list(set(test) - set(train_data))
-                self.mq_test = len(test_data)
+                self.mq = getSubLength(self.test)
+                self.train_data = list(map(lambda xs: getRandomSample(xs,0.8),self.test))
+                self.mq_train = getSubLength(self.train_data)
+                self.test_data = [list(set(self.test[0]) - set(self.train_data[0])),list(set(self.test[1]) - set(self.train_data[1]))]
+                self.mq_test = getSubLength(self.train_data)
 
 
 ### Aux Functions:
@@ -23,10 +23,16 @@ class testData:
 def concat(l):
         return [s for xs in l for s in xs]
 
+def getSubLength(xs):
+        return reduce(lambda x,y:x+y, map(len,xs))
+
+def getRandomSample(xs, p):
+        return random.sample(xs,int(floor(len(xs)*p)))
+
 ### Helper Functions:
 
 #def cleanString(message: str) -> str:
-def cleanString(message) :
+def cleanString(message):
         """Returns a curated string without symbols, multiple spaces, leading/trealing 
         spaces and lowercased."""
         return message.replace('W+',' ').replace('\s+',' ').lower().strip()
@@ -41,9 +47,9 @@ def parseFile():
         for line in f:
                 parse = line.split("\t")
                 if (parse[0] == "spam"):
-                    messages[0] += [[parse[1]]
+                        messages[0] += [parse[1]]
                 else:
-                    messages[1] += [[parse[1]]
+                        messages[1] += [parse[1]]
         f.close()
         return messages
 
@@ -57,8 +63,8 @@ def N_wi_spam(word,message_spam):
 
 def naive_bayes(message):
         data = testData() # Test data.
-        words_not_spam = map(lambda s: s.plit(),data.train_data[1])
-        words_spam = map(lambda s: s.plit(),data.train_data[0])
+        words_not_spam = concat(map(lambda s: s.plit(),data.train_data[1]))
+        words_spam = concat(map(lambda s: s.plit(),data.train_data[0]))
 	words =  words_not_spam + words_spam
         vocabulary = list(set(words))
 	N_vocabulary = len(vocabulary)  # Number of unique words in the dataset
@@ -132,6 +138,6 @@ def spam(f):
 	v=f.split()
 	#print (v)
 	naive_bayes(v)
-    
+
 #f=str(input("Introduce un mail:"))
 #spam(f)
