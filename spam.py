@@ -1,76 +1,105 @@
 import random
+from functools import reduce
 from math import floor
 
-#test=[["gana dinero sin hacer nada",1], ["nuevas promociones",0],["gana 100 dolares sin hacer nada al dia",1],["trabaja desde ya",0]]
+#from typing import Any
+#from typing import List
 
-def compose(f,g):
-        return lambda x: f(g(x))
+#### Classes:
+class testData:
+        """Record type that holds all the important data. """
+        def __init__(self):
+                """Note: mq means message quantity"""
+                self.test = parseFile()
+                self.mq = len(test)
+                self.train_data = random.sample(test, floor(cantidad_mensajes * 0.8))
+                self.mq_train = len(train_data)
+                self.test_data = list(set(test) - set(train_data))
+                self.mq_test = len(test_data)
 
 
-def cleanString(message):
+### Aux Functions:
+#def concat(l: List[List[Any]]) -> List[Any]:
+def concat(l):
+        return [s for xs in l for s in xs]
+
+### Helper Functions:
+
+#def cleanString(message: str) -> str:
+def cleanString(message) :
+        """Returns a curated string without symbols, multiple spaces, leading/trealing 
+        spaces and lowercased."""
         return message.replace('W+',' ').replace('\s+',' ').lower().strip()
 
+#def parseFile() -> List[List[Any]]:
+def parseFile():
+        """" Reads the spam collection sample and 
+        Returns a list whose first element contains all the spam messages
+        and its second element contains all the non spam messages"""
+        f = open("SMSSpamCollection")
+        messages = [[],[]]
+        for line in f:
+                parse = line.split("\t")
+                if (parse[0] == "spam"):
+                    messages[0] += [[parse[1]]
+                else:
+                    messages[1] += [[parse[1]]
+        f.close()
+        return messages
+
+#def N_wi_spam(word: str,message_spam: List[str]) -> int:
+def N_wi_spam(word,message_spam):                                        
+        words = concat(map(lambda s: s.split(),message_spam))
+        f = lambda w: 1 if (w==word) else 0
+        return reduce(lambda x,y: x+y,map(f,words))
+                                        
+### Main Functions:
 
 def naive_bayes(message):
-        test = parseFile()
-        cantidad_mensajes = len(test)
-        train_data = random.sample(test, floor(cantidad_mensajes * 0.8))
-        test_data = list(set(test) - set(train_data))
-	vocabulary=[]
-	words=[]
-	for i in range(len(test)):
-		w=list(map(cleanString,test[i][0].split()))
-		words+=w
-		#print (words)
-
+        data = testData() # Test data.
+        words_not_spam = map(lambda s: s.plit(),data.train_data[1])
+        words_spam = map(lambda s: s.plit(),data.train_data[0])
+	words =  words_not_spam + words_spam
         vocabulary = list(set(words))
 	N_vocabulary = len(vocabulary)  # Number of unique words in the dataset
+	N_not_spam=len(words_not_spam)	
+	N_spam=len(words_spam)  # Number of words in spam mails
+
+	alpha=1
+	P_spam = len(data.train_data[0])/data.mq_train
+	P_not_spam = len(data.train_data[1])/data.mq_train
 	
-	words_not_spam=[]
 	for i in range(len(test)):
 		if test[i][1]==0:
 			message=test[i][0].split()
-			words_not_spam+=message
-	#print (words_not_spam)
-	N_not_spam=len(words_not_spam)
 	
 	
-	words_spam=[]
-	message_spam=[]
+	message_spam=data.train_data[1]
 	for i in range(len(test)):
 		if test[i][1]==1:
-			message_spam.append(test[i][0])
-			mes=test[i][0].split()
-			words_spam+=mes
-	#print (message_spam,words_spam)		
+			mes=test[i][0].split()	
 	
-	N_spam=len(words_spam)  # Number of words in spam mails
-	#print (N_spam)
 	contador=0
 	for i in range(len(message_spam)):
 		for words in words_spam:
 			if words in message_spam[i]:
 					contador+=1	
 	N_wi_spam=contador-N_spam  # Number of words that repeats in every spam mail
-	#print (N_wi_spam)
-	alpha=1
-	P_spam=len(message_spam)/cantidad_mensajes
-	P_not_spam=N_not_spam/N_vocabulary
 	
 	q=classify(message,word,words_spam,words_not_spam,alpha,N_spam,N_vocabulary,N_wi_spam,P_spam,P_not_spam,N_not_spam,message_spam)
 	print (q)
 	
-def N_wi_spam(word,message_spam):
-	contador=0
-	for i in range(len(message_spam)):
-		if word in message_spam[i]:
-			w=message_spam[i].split()
-			for i in range(len(w)):
-				if word==w[i]:
-					contador+=1
-				else:
-					i=i+1
-	return contador	
+#def N_wi_spam(word,message_spam):
+#	contador=0
+#	for i in range(len(message_spam)):
+#		if word in message_spam[i]:
+#			w=message_spam[i].split()
+#			for i in range(len(w)):
+#				if word==w[i]:
+#					contador+=1
+#				else:
+#					i=i+1
+#	return contador	
 	
 def spam_(word,words_spam,alpha,N_spam,N_vocabulary,message_spam,P_spam):
 	if word in words_spam:
@@ -103,19 +132,6 @@ def spam(f):
 	v=f.split()
 	#print (v)
 	naive_bayes(v)
-
-def parseFile():
-        f = open("SMSSpamCollection")
-        messages = []
-        for line in f:
-                parse = line.split("\t")
-                if (parse[0] == "spam"):
-                        messages += [[parse[1],1]]
-                else:
-                        messages += [[parse[1],0]]
-        f.close()
-        return messages
-        
+    
 #f=str(input("Introduce un mail:"))
 #spam(f)
-
