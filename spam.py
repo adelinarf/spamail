@@ -1,4 +1,5 @@
 import random
+import re
 from functools import reduce
 from math import floor
 
@@ -40,7 +41,7 @@ def getRandomSample(xs, p):
 def cleanString(message):
     """Returns a curated string without symbols, multiple spaces, leading/trealing
     spaces and lowercased."""
-    return message.replace('\s+', ' ').lower().strip().translate(None,
+    return re.sub('\s+', ' ', message).lower().strip().translate(None,
                                                                  string.punctuation)
 
 
@@ -64,14 +65,18 @@ def parseFile():
 # def N_wi_spam(word: str,message_spam: List[str]) -> int:
 def N_wi_spam(word, message):
     words = concat(map(lambda s: s.split(), message))
-    def f(w): 1.0 if (w == word) else 0.0
-    return reduce(lambda x, y: x+y, map(f, words))
+    f = lambda w: 1.0 if (w == word) else 0.0
+    return sum(map(f, words))
 
 
 def p_wi_(word, words, message_, alpha, N_vocabulary, N_):
-    def f(w):  1.0 if word in w.split() else 0.0
+    f = lambda w: 1.0 if word in w.split() else 0.0
     if word in words:
-        return (1.0+reduce(lambda x, y: x+y, map(f, message_)))/(float(len(message_))+2.0)
+        aux = (1.0+sum(map(f, message_)))/(len(message_)+2.0)
+        if aux < 0.1:
+            return 1.0
+        else:
+            return aux
         # return (N_wi_spam(word,message_)+alpha)/float((N_+ alpha*N_vocabulary))
     else:
         return 1.0
@@ -106,14 +111,14 @@ def classify(message, words_spam, words_not_spam, alpha, N_spam, N_vocabulary,
     p_not_spam_message = P_not_spam
     print(message)
     for word in list(set(message.split())):
-        p_spam_message     *= p_wi_(word, words_spam, message_spam, alpha,
-                                    N_vocabulary, N_spam)
+        p_spam_message     *= p_wi_(word, words_spam, message_spam,
+                                    alpha, N_vocabulary, N_spam)
         p_not_spam_message *= p_wi_(word, words_not_spam, message_not_spam,
                                     alpha, N_vocabulary, N_not_spam)
         # p_spam_message*=spam_(word,words_spam,alpha,N_spam,N_vocabulary,message_spam,P_spam)
         # p_not_spam_message*=not_spam_(word,words_not_spam,P_not_spam,message_spam,alpha,N_vocabulary,N_not_spam)
-        print(p_spam_message)
-        print(p_not_spam_message)
+    print(p_spam_message)
+    print(p_not_spam_message)
     if p_not_spam_message > p_spam_message:
         return "Not spam"
     elif p_not_spam_message < p_spam_message:
@@ -124,7 +129,7 @@ def classify(message, words_spam, words_not_spam, alpha, N_spam, N_vocabulary,
 
 def spam():
     data = testData()
-    datas = data.test
+    datas = data.test_data
     mensajes = []
     spam = []
     notspam = []
