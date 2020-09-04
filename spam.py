@@ -75,22 +75,12 @@ def naive_bayes(message):
 	P_spam = len(data.train_data[0])/data.mq_train
 	P_not_spam = len(data.train_data[1])/data.mq_train
 	
-	for i in range(len(test)):
-		if test[i][1]==0:
-			message=test[i][0].split()
+	message=data.train_data[1]
 	
 	
-	message_spam=data.train_data[1]
-	for i in range(len(test)):
-		if test[i][1]==1:
-			mes=test[i][0].split()	
+	message_spam=data.train_data[0]
 	
-	contador=0
-	for i in range(len(message_spam)):
-		for words in words_spam:
-			if words in message_spam[i]:
-					contador+=1	
-	N_wi_spam=contador-N_spam  # Number of words that repeats in every spam mail
+	
 	
 	q=classify(message,word,words_spam,words_not_spam,alpha,N_spam,N_vocabulary,P_spam,P_not_spam,N_not_spam,message_spam)
 	print (q)
