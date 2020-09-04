@@ -69,14 +69,11 @@ def N_wi_spam(word, message):
     return sum(map(f, words))
 
 
-def p_wi_(word, words, message_, alpha, N_vocabulary, N_):
+def p_wi_(word, words, message_):
     f = lambda w: 1.0 if word in w.split() else 0.0
     if word in words:
         aux = (1.0+sum(map(f, message_)))/(len(message_)+2.0)
-        if aux < 0.1:
-            return 1.0
-        else:
-            return aux
+        return aux
         # return (N_wi_spam(word,message_)+alpha)/float((N_+ alpha*N_vocabulary))
     else:
         return 1.0
@@ -98,30 +95,27 @@ def naive_bayes(message):
     P_not_spam = len(data.train_data[1])/float(data.mq_train)
     message_not_spam = data.train_data[1]
     message_spam = data.train_data[0]
-    q = classify(message, words_spam, words_not_spam, alpha, N_spam,
-                 N_vocabulary, P_spam, P_not_spam, N_not_spam,
-                 message_spam, message_not_spam)
+    q = classify(message, words_spam, words_not_spam, 
+                 P_spam, P_not_spam, message_spam, message_not_spam)
     print(q)
     return (q)
 
 
-def classify(message, words_spam, words_not_spam, alpha, N_spam, N_vocabulary,
-             P_spam, P_not_spam, N_not_spam, message_spam, message_not_spam):
+def classify(message, words_spam, words_not_spam, 
+             P_spam, P_not_spam, message_spam, message_not_spam):
     p_spam_message = P_spam
     p_not_spam_message = P_not_spam
     print(message)
     for word in list(set(message.split())):
-        p_spam_message     *= p_wi_(word, words_spam, message_spam,
-                                    alpha, N_vocabulary, N_spam)
-        p_not_spam_message *= p_wi_(word, words_not_spam, message_not_spam,
-                                    alpha, N_vocabulary, N_not_spam)
-        # p_spam_message*=spam_(word,words_spam,alpha,N_spam,N_vocabulary,message_spam,P_spam)
-        # p_not_spam_message*=not_spam_(word,words_not_spam,P_not_spam,message_spam,alpha,N_vocabulary,N_not_spam)
-    print(p_spam_message)
-    print(p_not_spam_message)
-    if p_not_spam_message > p_spam_message:
+        p_spam_message     *= p_wi_(word, words_spam, message_spam)
+        p_not_spam_message *= p_wi_(word, words_not_spam, message_not_spam)
+    p_spam_prob=p_spam_message/(p_spam_message+p_not_spam_message)
+    p_not_spam_prob=p_not_spam_message/(p_not_spam_message+p_spam_message)
+    print(p_spam_prob)
+    print(p_not_spam_prob)
+    if p_not_spam_prob > p_spam_prob:
         return "Not spam"
-    elif p_not_spam_message < p_spam_message:
+    elif p_not_spam_prob < p_spam_prob:
         return "Spam"
     else:
         return "Can't be classified"
@@ -143,10 +137,10 @@ def spam():
                 notspam.append(a)  # si no es spam se mete en otra lista
         mensajes.append(spam)   # se unen las listas de no spam y spam
         mensajes.append(notspam)
-        if set(mensajes[0]) == set(datas[0]) and set(mensajes[1]) == set(datas[1]):
-            print("Is ok the classification")   # se evalua si son correctas o no
-        else:
-            print("Bad classification")
+        #if set(mensajes[0]) == set(datas[0]) and set(mensajes[1]) == set(datas[1]):
+            #print("Is ok the classification")   # se evalua si son correctas o no
+        #else:
+            #print("Bad classification")
         good = 0
         goodnot = 0
         for i in range(len(mensajes[0])):
@@ -155,4 +149,5 @@ def spam():
         for i in range(len(mensajes[1])):
             if mensajes[1][i] in datas[1]:
                 goodnot += 1
-        return (good+goodnot)
+        print (good+goodnot)
+spam()
