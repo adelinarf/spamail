@@ -94,6 +94,7 @@ def naive_bayes(message):
 	
 	q=classify(message,word,words_spam,words_not_spam,alpha,N_spam,N_vocabulary,P_spam,P_not_spam,N_not_spam,message_spam)
 	print (q)
+	return (q)
 	
 #def N_wi_spam(word,message_spam):
 #	contador=0
