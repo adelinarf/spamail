@@ -134,10 +134,34 @@ def classify(message,word,words_spam,words_not_spam,alpha,N_spam,N_vocabulary,P_
 		"Can't be classified"
 	
 	
-def spam(f):
-	v=f.split()
-	#print (v)
-	naive_bayes(v)
+def spam():
+	data = testData()
+	datas=data.test
+	mensajes=[]
+	spam=[]
+	notspam=[]
+	for i in range(len(datas)):
+		a=datas[i]   # se toma la posicion i del data set
+		for j in range(len(a)):
+			resultado=naive_bayes(a[j])  # se aplica la funcion ahi
+			if resultado=="Spam":
+				spam.append(a)   # si es spam se mete en una lista
+			else: 
+				notspam.append(a)  # si no es spam se mete en otra lista
+	mensajes.append(spam)   # se unen las listas de no spam y spam
+	mensajes.append(notspam)
+	if set(mensajes[0])==set(datas[0]) and set(mensajes[1])==set(datas[1]):
+		print ("Is ok the classification")   # se evalua si son correctas o no
+	else:
+		print ("Bad classification")
+	good=0
+	goodnot=0
+	for i in range(len(mensajes[0])):
+		if mensajes[0][i] in datas[0]:   # si la posicion de mensajes tiene el mismo texto que datas esta bien y suma 1
+			good+=1
+	for i in range(len(mensajes[1])):
+		if mensajes[1][i] in datas[1]:    
+			goodnot+=1
+	return (good+goodnot)
 
-#f=str(input("Introduce un mail:"))
-#spam(f)
+#spam()
