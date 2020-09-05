@@ -1,5 +1,6 @@
 import random
 import re
+import string
 from functools import reduce
 from math import floor
 
@@ -62,19 +63,11 @@ def parseFile():
     return messages
 
 
-# def N_wi_spam(word: str,message_spam: List[str]) -> int:
-def N_wi_spam(word, message):
-    words = concat(map(lambda s: s.split(), message))
-    f = lambda w: 1.0 if (w == word) else 0.0
-    return sum(map(f, words))
-
-
 def p_wi_(word, words, message_):
     f = lambda w: 1.0 if word in w.split() else 0.0
     if word in words:
         aux = (1.0+sum(map(f, message_)))/(len(message_)+2.0)
         return aux
-        # return (N_wi_spam(word,message_)+alpha)/float((N_+ alpha*N_vocabulary))
     else:
         return 1.0
 
@@ -83,36 +76,34 @@ def p_wi_(word, words, message_):
 
 def naive_bayes(message):
     data = testData()  # Test data.
-    words_not_spam = concat(map(lambda s: s.split(), data.train_data[1]))  # Words in all the not spam messages
-    words_spam = concat(map(lambda s: s.split(), data.train_data[0]))  # Words in all the spam messages
-    words = words_not_spam + words_spam  # total words
-    vocabulary = list(set(words))  # unique words
-    N_vocabulary = len(vocabulary)  # Number of unique words in the dataset
-    N_not_spam = len(words_not_spam)  # nomber of words in not spam mails
-    N_spam = len(words_spam)  # Number of words in spam mails
-    alpha = 1.0
-    P_spam = len(data.train_data[0])/float(data.mq_train)
+
+    words_not_spam = list(set(concat(map(lambda s: s.split(), data.train_data[1]))))  # Words in all the not spam messages
     P_not_spam = len(data.train_data[1])/float(data.mq_train)
     message_not_spam = data.train_data[1]
+
+    words_spam = list(set(concat(map(lambda s: s.split(), data.train_data[0]))))  # Words in all the spam messages
+    P_spam = len(data.train_data[0])/float(data.mq_train)
     message_spam = data.train_data[0]
-    q = classify(message, words_spam, words_not_spam, 
+
+    q = classify(message, words_spam, words_not_spam,
                  P_spam, P_not_spam, message_spam, message_not_spam)
     print(q)
     return (q)
 
 
-def classify(message, words_spam, words_not_spam, 
+def classify(message, words_spam, words_not_spam,
              P_spam, P_not_spam, message_spam, message_not_spam):
     p_spam_message = P_spam
     p_not_spam_message = P_not_spam
     print(message)
-    for word in list(set(message.split())):
+    for word in set(message.split()):
         p_spam_message     *= p_wi_(word, words_spam, message_spam)
         p_not_spam_message *= p_wi_(word, words_not_spam, message_not_spam)
-    p_spam_prob=p_spam_message/(p_spam_message+p_not_spam_message)
-    p_not_spam_prob=p_not_spam_message/(p_not_spam_message+p_spam_message)
+    p_spam_prob = p_spam_message / (p_spam_message + p_not_spam_message)
+    p_not_spam_prob = p_not_spam_message / (p_not_spam_message + p_spam_message)
     print(p_spam_prob)
     print(p_not_spam_prob)
+
     if p_not_spam_prob > p_spam_prob:
         return "Not spam"
     elif p_not_spam_prob < p_spam_prob:
@@ -123,7 +114,7 @@ def classify(message, words_spam, words_not_spam,
 
 def spam():
     data = testData()
-    datas = data.test_data
+    datas = [data.test_data[0][0:500], data.test_data[1][0:500]]
     mensajes = []
     spam = []
     notspam = []
@@ -132,9 +123,9 @@ def spam():
         for j in range(len(a)):
             resultado = naive_bayes(a[j])  # se aplica la funcion ahi
             if resultado == "Spam":
-                spam.append(a)   # si es spam se mete en una lista
+                spam.append(a[j])   # si es spam se mete en una lista
             else:
-                notspam.append(a)  # si no es spam se mete en otra lista
+                notspam.append(a[j])  # si no es spam se mete en otra lista
         mensajes.append(spam)   # se unen las listas de no spam y spam
         mensajes.append(notspam)
         #if set(mensajes[0]) == set(datas[0]) and set(mensajes[1]) == set(datas[1]):
@@ -149,5 +140,7 @@ def spam():
         for i in range(len(mensajes[1])):
             if mensajes[1][i] in datas[1]:
                 goodnot += 1
-        print (good+goodnot)
+        print(good, goodnot)
+
+
 spam()
