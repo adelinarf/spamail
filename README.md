@@ -4,9 +4,10 @@
 ##### 2. Install
 ##### 3. Run
 
-This program classifies messages from an email account and relocate spam messages into the spam folder.
+This program is an implementation of the Naive Bayes classifier presented in () hooked to the Gmail API.
+
 ## Files
-spam.py 
+spam.py.
 QuickStart.py
 
 
